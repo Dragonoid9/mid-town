@@ -1,6 +1,8 @@
 package com.rac.ktm.midtown.controller;
 
 import com.rac.ktm.midtown.dto.UserDto;
+import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
+import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,7 +56,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute("userDto") UserDto userDto, BindingResult bindingResult,Model model) {
+    public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult,Model model) {
         // Implement your login logic here
         // Check username and password, authenticate the user, etc.
         // You might want to use Spring Security for a more comprehensive solution
@@ -66,9 +68,9 @@ public class UserController {
             }
 
             // Example: Authenticate the user (replace this with your authentication logic)
-            boolean isAuthenticated = userService.authenticateUser(userDto.getUserName(), userDto.getPassword());
+            LoginResponseDto isAuthenticated = userService.authenticateUser(loginRequestDto);
 
-            if (isAuthenticated) {
+            if (isAuthenticated !=null) {
                 // Redirect to a success page or dashboard
                 return "welcome";
             } else {

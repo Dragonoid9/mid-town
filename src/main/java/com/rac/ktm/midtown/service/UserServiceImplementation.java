@@ -1,6 +1,8 @@
 package com.rac.ktm.midtown.service;
 
 import com.rac.ktm.midtown.dto.UserDto;
+import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
+import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.entity.User;
 import com.rac.ktm.midtown.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,15 +28,20 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public boolean authenticateUser(String identifier, String password) {
+    public LoginResponseDto authenticateUser(LoginRequestDto loginRequestDto) {
+        String identifier=loginRequestDto.getIdentifier();
+        String password=loginRequestDto.getPassword();
         if (identifier == null || identifier.isEmpty()) {
-            return false; // Invalid identifier
+            return null;
         }
 
-        // Example authentication logic
         User user = userRepository.findByUserNameOrEmail(identifier,password);
 
-        return user != null && user.getPassword().equals(password); // Authentication successful
-        // Authentication failed
+         if(user != null && user.getPassword().equals(password)){
+             LoginResponseDto loginResponseDto=new LoginResponseDto();
+             loginResponseDto.setUsername(user.getUserName());
+            return loginResponseDto;
+         }
+        return null;
     }
 }
