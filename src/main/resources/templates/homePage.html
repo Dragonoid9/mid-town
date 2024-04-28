@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <!-- Optional JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtzklknjlxq8ZRgyzGp4pC07Emhew6i/6-6pu4ozlNOU9skjmRo8x"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/rac/index}">Spring Security Custom Login Example</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" th:href="@{/rac/index}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/rac/events}">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/rac/about}">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h1>Welcome to Our Community!</h1>
+    <p>Check out the latest highlights from our recent activities and events.</p>
+
+    <!-- Recent Pictures Section -->
+    <div class="row my-4">
+        <h2>Recent Pictures</h2>
+        <div th:each="picture : ${recentPictures}">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <img th:src="@{${picture.url}}" class="card-img-top" alt="Recent Picture">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${picture.title}">Picture Title</h5>
+                        <p class="card-text" th:text="${picture.description}">Picture Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Highlights Section -->
+    <div class="row my-4">
+        <h2>Event Highlights</h2>
+        <div th:each="event : ${recentEvents}">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <img th:src="@{${event.imageUrl}}" class="card-img-top" alt="Event Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${event.name}">Event Name</h5>
+                        <p class="card-text" th:text="${event.description}">Event Description</p>
+                        <p class="card-text"><small class="text-muted" th:text="${event.date}">Event Date</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
