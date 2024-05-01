@@ -19,9 +19,33 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/homePage")
+    public String showHomePage() {
+        return "homePage";
+    }
+
+    @GetMapping("/events")
+    public String showEvents(Model model) {
+        return "events";
+    }
+    @GetMapping("/news")
+    public String showNewsPage() {
+        return "news";
+    }
+
+    @GetMapping("/podcast")
+    public String showPodcastPage() {
+        return "podcast";
+    }
+
     @GetMapping("/index")
     public String showIndexPage() {
         return "index";
+    }
+
+    @GetMapping("/about")
+    public String showAboutPage() {
+        return "about";
     }
 
     @GetMapping("/register")
@@ -39,7 +63,7 @@ public class UserController {
             }
 
             userService.registerUser(userDto);
-            return "login";
+            return "homePage";
         } catch (Exception e) {
             // Log the exception
             e.printStackTrace();
@@ -85,4 +109,5 @@ public class UserController {
             return "errorPage";
         }
     }
+
 }

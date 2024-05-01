@@ -1,56 +1,170 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <meta charset="ISO-8859-1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"
-            integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
-            integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAC Ktm Mid-Town</title>
+    <style>
+        /* Basic Reset */
+        body, h2, a, img, form, input, label {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Utility and global styles */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center; /* Center the form box horizontally */
+        }
+
+        /* Navigation styling */
+        .navbar {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .nav-item {
+            list-style: none;
+            display: inline;
+            margin-left: 20px;
+        }
+
+        .nav-link, .signup-link {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .nav-link:hover, .signup-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Header content styling */
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            color: white;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .header-title {
+            flex-grow: 1;
+            text-align: center;
+            margin-left: -90px;
+        }
+
+        .nav-logo {
+            position: absolute;
+            left: 10px;
+            height: 60px;
+        }
+
+        /* Form styling */
+        .form-box {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 500px; /* Set maximum width for the form */
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%; /* Full width of the form-group */
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: darkgreen;
+        }
+
+        .form-inline, .form-controls, .login-group {
+            display: none; /* Hide login components in registration form */
+        }
+
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h3>Registration with the Required Bio-Data</h3>
-    <div class="card" style="width: 55rem; ">
-        <div class="card-header text-center bg-info ">
-            <h3>Register</h3>
-        </div>
-        <div class="card-body">
-            <form th:action="@{/rac/register}" method="POST" th:object="${userDto}">
+<div class="header-content">
+    <img src="/images/midtown.png" alt="Rotaract Club Logo" class="nav-logo">
+    <h2 class="header-title">Rotaract Club of Kathmandu Mid-Town</h2>
+</div>
 
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" th:field="*{userName}">
-                </div>
+<div class="navbar">
+    <ul>
+        <li class="nav-item"><a class="nav-link" href="/rac/homePage">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/events">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/news">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
+    </ul>
+</div>
 
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" aria-describedby="emailHelp"
-                           th:field="*{name}">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp"
-                           th:field="*{email}">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" th:field="*{password}">
-                </div>
-                <div class="form-group">
-                    <label for="phonenumber">Mobile Number</label>
-                    <input type="text" class="form-control" id="phonenumber" th:field="*{phoneNumber}">
-                </div>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-primary">
-                </div>
-            </form>
-        </div>
+<div class="container">
+    <div class="form-box">
+        <h1>Register with Us</h1>
+        <form th:action="@{/rac/register}" method="POST" th:object="${userDto}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" th:field="*{userName}">
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" th:field="*{email}">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" th:field="*{password}">
+            </div>
+            <div class="form-group">
+                <label for="phonenumber">Mobile Number</label>
+                <input type="text" class="form-control" id="phonenumber" th:field="*{phoneNumber}">
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn" value="Register">
+            </div>
+        </form>
     </div>
 </div>
 </body>
