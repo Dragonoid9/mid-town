@@ -13,13 +13,17 @@ body, h2, a, img {
     background-color: #000;
     color: white;
     padding: 15px 20px;
-    position: relative;
+    position: fixed; /* Fixed position */
+    top: 0; /* Fixed to the top */
+    left: 0;
+    width: 100%; /* Full width */
+    z-index: 1000; /* Ensure it stays on top */
 }
 
 .header-title {
     flex-grow: 1;
     text-align: center;
-    margin-left: -90px; /* Adjust this as needed */
+    margin-left: -100px; /* Adjust this as needed */
 }
 
 .nav-logo {
