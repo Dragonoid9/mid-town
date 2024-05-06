@@ -32,18 +32,21 @@
         <li class="nav-item"><a class="nav-link" href="#">Podcast</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
     </ul>
-    <form method="post" role="form" th:action="@{/rac/login}" class="form">
-        <div class="form-inline">
-            <div class="form-controls">
-                <input class="form-control" type="text" name="identifier" placeholder="Username">
-                <input class="form-control" type="password" name="password" placeholder="Password">
+    <!-- Display based on login status -->
+    <div th:if="${!isLoggedIn}">
+        <form method="post" role="form" th:action="@{/rac/login}" class="form">
+            <div class="form-inline">
+                <div class="form-controls">
+                    <input class="form-control" type="text" name="identifier" placeholder="Username">
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                </div>
+                <div class="login-group">
+                    <button class="btn">Login</button>
+                    <a class="signup-link" href="/rac/register">Not registered? Sign up</a>
+                </div>
             </div>
-            <div class="login-group">
-                <button class="btn">Login</button>
-                <a class="signup-link" href="/rac/register">Not registered? Sign up</a>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <div class="container">

@@ -4,6 +4,7 @@ import com.rac.ktm.midtown.dto.UserDto;
 import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,22 +21,32 @@ public class UserController {
     }
 
     @GetMapping("/homePage")
-    public String showHomePage() {
+    public String showHomePage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "homePage";
     }
 
     @GetMapping("/events")
-    public String showEvents(Model model) {
+    public String showEvents(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "events";
     }
     @GetMapping("/news")
-    public String showNewsPage() {
+    public String showNewsPage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "news";
     }
 
     @GetMapping("/podcast")
-    public String showPodcastPage() {
+    public String showPodcastPage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "podcast";
+    }
+
+    @GetMapping("/about")
+    public String showAboutPage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        return "about";
     }
 
     @GetMapping("/index")
@@ -43,10 +54,6 @@ public class UserController {
         return "index";
     }
 
-    @GetMapping("/about")
-    public String showAboutPage() {
-        return "about";
-    }
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -80,27 +87,26 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult,Model model) {
-        // Implement your login logic here
-        // Check username and password, authenticate the user, etc.
-        // You might want to use Spring Security for a more comprehensive solution
+    public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult,Model model, HttpSession session) {
 
         try {
             if (bindingResult.hasErrors()) {
                 // Handle binding errors
-                return "login";
+                    model.addAttribute("loginError", "Error in form submission");
+                    return "homePage";
             }
 
             // Example: Authenticate the user (replace this with your authentication logic)
             LoginResponseDto isAuthenticated = userService.authenticateUser(loginRequestDto);
 
             if (isAuthenticated !=null) {
-                // Redirect to a success page or dashboard
-                return "welcome";
+                session.setAttribute("isLoggedIn", true);  // Set login flag in session
+                session.setAttribute("user", isAuthenticated.getUsername());
+                return "redirect:/rac/homePage";  // Redirect to prevent form re-submission issues
             } else {
                 // Redirect back to the login page with an error message
                 model.addAttribute("loginError", "Invalid username or password");
-                return "login";
+                return "homePage";
             }
         } catch (Exception e) {
             // Log the exception
@@ -108,6 +114,11 @@ public class UserController {
             // Redirect to the error page with an error message
             return "errorPage";
         }
+    }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();  // Clear the session
+        return "redirect:/rac/homePage";  // Redirect to the homepage
     }
 
 }
