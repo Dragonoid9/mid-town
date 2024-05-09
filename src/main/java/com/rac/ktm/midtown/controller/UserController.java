@@ -48,12 +48,11 @@ public class UserController {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "about";
     }
-
-    @GetMapping("/index")
-    public String showIndexPage() {
-        return "index";
+    @GetMapping("/admin")
+    public String showAdminPage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+            return "admin";
     }
-
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -80,12 +79,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        model.addAttribute("userDto", new UserDto());
-        return "login";
-    }
-
     @PostMapping("/login")
     public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult,Model model, HttpSession session) {
 
@@ -101,7 +94,7 @@ public class UserController {
 
             if (isAuthenticated !=null) {
                 session.setAttribute("isLoggedIn", true);  // Set login flag in session
-                session.setAttribute("user", isAuthenticated.getUsername());
+                session.setAttribute("user", isAuthenticated.getUserName());
                 return "redirect:/rac/homePage";  // Redirect to prevent form re-submission issues
             } else {
                 // Redirect back to the login page with an error message
@@ -121,4 +114,9 @@ public class UserController {
         return "redirect:/rac/homePage";  // Redirect to the homepage
     }
 
+    @GetMapping("/profile")
+    public String showProfilePage(Model model, HttpSession session) {
+        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        return "profile";
+    }
 }

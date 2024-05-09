@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/navcircle.css">
+    <script src="/javascript/circle.js" defer></script>
     <style>
         /* Utility classes */
         .container {
@@ -31,7 +33,17 @@
         <li class="nav-item"><a class="nav-link" href="#">News</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
+        <li class="nav-item" th:if="${isLoggedIn}"><a class="nav-link" href="/rac/admin">Admin</a></li>
     </ul>
+    <div class="user-menu" th:if="${isLoggedIn}">
+        <div class="user-circle" onclick="toggleDropdownMenu()">
+            <span th:text="${session.user.charAt(0)}">U</span> <!-- Displays the first letter of the username -->
+        </div>
+        <div class="dropdown-menu" id="userDropdown">
+            <a href="/rac/profile">Profile</a>
+            <a href="/rac/logout">Logout</a>
+        </div>
+    </div>
     <!-- Display based on login status -->
     <div th:if="${!isLoggedIn}">
         <form method="post" role="form" th:action="@{/rac/login}" class="form">

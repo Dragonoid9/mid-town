@@ -39,7 +39,7 @@ public class UserServiceImplementation implements UserService {
 
          if(user != null && user.getPassword().equals(password)){
              LoginResponseDto loginResponseDto=new LoginResponseDto();
-             loginResponseDto.setUsername(user.getUserName());
+             loginResponseDto.setUserName(user.getUserName());
             return loginResponseDto;
          }
         return null;

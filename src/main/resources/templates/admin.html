@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAC Ktm Mid-Town About Us</title>
+    <title>RAC Ktm Mid-Town Admin</title>
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -32,8 +32,8 @@
         <li class="nav-item"><a class="nav-link" href="/rac/events">Events</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/news">News</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-        <li class="nav-item" th:if="${isLoggedIn}"><a class="nav-link" href="/rac/admin">Admin</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
+        <li class="nav-item" th:if="${isLoggedIn}"><a class="nav-link" href="#">Admin</a></li>
     </ul>
     <div class="user-menu" th:if="${isLoggedIn}">
         <div class="user-circle" onclick="toggleDropdownMenu()">
@@ -44,7 +44,7 @@
             <a href="/rac/logout">Logout</a>
         </div>
     </div>
-    <!-- Display based on login status -->
+    <!--     Display based on login status -->
     <div th:if="${!isLoggedIn}">
         <form method="post" role="form" th:action="@{/rac/login}" class="form">
             <div class="form-inline">
@@ -62,7 +62,7 @@
 </div>
 
 <div class="container">
-    <h1>Welcome to Our About Us Page</h1>
+    <h1>Welcome to Our Admin Page</h1>
     <p>Feel free to explore the features of our application!</p>
 </div>
 <footer class="footer">
