@@ -2,7 +2,9 @@ package com.rac.ktm.midtown.controller;
 
 import com.rac.ktm.midtown.dto.UserDto;
 import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
+import com.rac.ktm.midtown.dto.requestDto.ProfileRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
+import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
 import com.rac.ktm.midtown.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,7 @@ public class UserController {
     @GetMapping("/homePage")
     public String showHomePage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        model.addAttribute("loginError", null);
         return "homePage";
     }
 
@@ -31,6 +34,7 @@ public class UserController {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "events";
     }
+
     @GetMapping("/news")
     public String showNewsPage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
@@ -48,10 +52,11 @@ public class UserController {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         return "about";
     }
+
     @GetMapping("/admin")
     public String showAdminPage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
-            return "admin";
+        return "admin";
     }
 
     @GetMapping("/register")
@@ -80,34 +85,40 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult,Model model, HttpSession session) {
+    public String loginUser(@ModelAttribute("loginRequestDto") LoginRequestDto loginRequestDto, BindingResult bindingResult, Model model, HttpSession session) {
 
         try {
             if (bindingResult.hasErrors()) {
                 // Handle binding errors
-                    model.addAttribute("loginError", "Error in form submission");
-                    return "homePage";
+                model.addAttribute("loginError", "⚠ Error in form submission ⚠");
+                return "homePage";
             }
 
             // Example: Authenticate the user (replace this with your authentication logic)
             LoginResponseDto isAuthenticated = userService.authenticateUser(loginRequestDto);
 
-            if (isAuthenticated !=null) {
+            if (isAuthenticated != null) {
                 session.setAttribute("isLoggedIn", true);  // Set login flag in session
                 session.setAttribute("user", isAuthenticated.getUserName());
+                session.removeAttribute("passwordError");
+                model.addAttribute("loginError", null);
                 return "redirect:/rac/homePage";  // Redirect to prevent form re-submission issues
             } else {
-                // Redirect back to the login page with an error message
-                model.addAttribute("loginError", "Invalid username or password");
+                // Handle authentication failure
+                model.addAttribute("loginError", "⚠ Invalid username or password ⚠");
                 return "homePage";
             }
         } catch (Exception e) {
             // Log the exception
             e.printStackTrace();
-            // Redirect to the error page with an error message
-            return "errorPage";
+            model.addAttribute("loginError", "⚠ An unexpected error occurred ⚠");
+            return "homePage";
+        } finally {
+            // Clear passwordError attribute if it was set before
+            model.addAttribute("passwordError", null);
         }
     }
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();  // Clear the session
@@ -115,8 +126,40 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String showProfilePage(Model model, HttpSession session) {
+    public String showProfilePage(Model model, HttpSession session, @RequestParam("username") String username) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        model.addAttribute("userDto", new UserDto());
+        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
+        profileRequestDto.setUserName(username);
+        ProfileResponseDto profileResponseDto = userService.profileRequest(profileRequestDto);
+        model.addAttribute("profileResponseDto", profileResponseDto);
+        session.removeAttribute("passwordError");
         return "profile";
+    }
+
+    @PostMapping("/updateProfile")
+    public String updateProfile(@ModelAttribute("profileResponseDto") ProfileResponseDto profileResponseDto,
+                                @RequestParam("currentPassword") String currentPassword,
+                                HttpSession session,
+                                Model model) {
+        try {
+            // Perform password verification here
+            if (!userService.verifyPassword(profileResponseDto.getUserName(), currentPassword)) {
+                model.addAttribute("passwordError", "⚠ Incorrect current password ⚠");
+                return "profile"; // Return to the profile page with an error message
+            }
+
+            // Update profile details if password verification is successful
+            userService.updateProfile(profileResponseDto);
+
+            return "redirect:/rac/homePage"; // Redirect to the home page after successful update
+        } catch (Exception e) {
+            // Handle any exceptions or errors
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "⚠ An unexpected error occurred. Please try again. ⚠");
+            return "profile";
+
+
+        }
     }
 }

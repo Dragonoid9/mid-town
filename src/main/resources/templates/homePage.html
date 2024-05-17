@@ -40,7 +40,7 @@
             <span th:text="${session.user.charAt(0)}">U</span> <!-- Displays the first letter of the username -->
         </div>
         <div class="dropdown-menu" id="userDropdown">
-            <a href="/rac/profile">Profile</a>
+            <a th:href="@{/rac/profile(username=${session.user})}">Profile</a>
             <a href="/rac/logout">Logout</a>
         </div>
     </div>
@@ -53,6 +53,7 @@
                     <input class="form-control" type="password" name="password" placeholder="Password">
                 </div>
                 <div class="login-group">
+                    <p th:if="${loginError}" th:text="${loginError}" class="error-message"></p>
                     <button class="btn">Login</button>
                     <a class="signup-link" href="/rac/register">Not registered? Sign up</a>
                 </div>
