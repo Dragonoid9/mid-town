@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/navcircle.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <script src="/javascript/circle.js" defer></script>
     <style>
-        /* Utility classes */
+            /* Utility classes */
         .container {
             width: 100%;
             max-width: 1200px;
@@ -44,27 +45,64 @@
             <a href="/rac/logout">Logout</a>
         </div>
     </div>
-    <!--     Display based on login status -->
-    <div th:if="${!isLoggedIn}">
-        <form method="post" role="form" th:action="@{/rac/login}" class="form">
-            <div class="form-inline">
-                <div class="form-controls">
-                    <input class="form-control" type="text" name="identifier" placeholder="Username">
-                    <input class="form-control" type="password" name="password" placeholder="Password">
-                </div>
-                <div class="login-group">
-                    <button class="btn">Login</button>
-                    <a class="signup-link" href="/rac/register">Not registered? Sign up</a>
-                </div>
-            </div>
-        </form>
+</div>
+<div class="admin-container">
+    <div class="sidebar">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/rac/post/listpost">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/news/listnews">News</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/podcast/listpodcast">Podcast</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <section>
+            <h2>Event Management</h2>
+            <a th:href="@{/rac/post/create}">Create New Event</a>
+        </section>
+        <div class="table-container">
+            <h5>Events</h5>
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th>Updated By</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="post, iterStat : ${posts}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${post.title}"></td>
+                    <td th:text="${post.date}"></td>
+                    <td th:text="${post.location}"></td>
+                    <td class="description" th:text="${post.description}"></td>
+                    <td th:text="${post.category}"></td>
+                    <td th:text="${post.status}"></td>
+                    <td th:text="${post.createdBy}"></td>
+                    <td th:text="${post.updatedBy}"></td>
+                    <td>
+                        <img th:src="${post.imageUrl}" class="img-thumbnail">
+                    </td>
+                    <td class="actions">
+                        <a th:href="@{/rac/post/edit/{id}(id=${post.id})}">Edit</a>
+                        <a th:href="@{/rac/post/delete/{id}(id=${post.id})}"
+                        onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div class="container">
-    <h1>Welcome to Our Admin Page</h1>
-    <p>Feel free to explore the features of our application!</p>
-</div>
 <footer class="footer">
     <p>© 2024 Rotaract Club of Kathmandu Mid-Town. All rights reserved.</p>
 </footer>

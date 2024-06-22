@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAC Ktm Mid-Town Admin</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/navcircle.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <script src="/javascript/circle.js" defer></script>
+    <style>
+        /* Utility classes */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="header-content">
+    <!-- Logo Image -->
+    <img src="/images/midtown.png" alt="Rotaract Club Logo" class="nav-logo">
+    <!-- Club Title -->
+    <h2 class="header-title">Rotaract Club of Kathmandu Mid-Town</h2>
+</div>
+
+<div class="navbar">
+    <ul>
+        <li class="nav-item"><a class="nav-link" href="/rac/homePage">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/events">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/news">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
+        <li class="nav-item" th:if="${isLoggedIn}"><a class="nav-link" href="#">Admin</a></li>
+    </ul>
+    <div class="user-menu" th:if="${isLoggedIn}">
+        <div class="user-circle" onclick="toggleDropdownMenu()">
+            <span th:text="${session.user.charAt(0)}">U</span> <!-- Displays the first letter of the username -->
+        </div>
+        <div class="dropdown-menu" id="userDropdown">
+            <a href="/rac/profile">Profile</a>
+            <a href="/rac/logout">Logout</a>
+        </div>
+    </div>
+</div>
+<div class="admin-container">
+    <div class="sidebar">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/rac/post/listpost">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/news/listnews">News</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/podcast/listpodcast">Podcast</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <section>
+            <h2>News Management</h2>
+            <a href="/rac/news/create">Create New News</a>
+        </section>
+        <div class="table-container">
+            <h5>News</h5>
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Link</th>
+                    <th>Created By</th>
+                    <th>Updated By</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="newsItem, iterStat : ${news}">
+                    <td th:text="${iterStat.index + 1}"></td>
+                    <td th:text="${newsItem.title}"></td>
+                    <td class="description" th:text="${newsItem.description}"></td>
+                    <td><a th:href="${newsItem.link}" th:text="${newsItem.link}"></a></td>
+                    <td th:text="${newsItem.createdBy}"></td>
+                    <td th:text="${newsItem.updatedBy}"></td>
+                    <td>
+                        <img th:src="${newsItem.imageUrl}" class="img-thumbnail">
+                    </td>
+                    <td class="actions">
+                        <a th:href="@{/rac/news/edit/{id}(id=${newsItem.id})}">Edit</a>
+                        <a th:href="@{/rac/news/delete/{id}(id=${newsItem.id})}" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 Rotaract Club of Kathmandu Mid-Town. All rights reserved.</p>
+</footer>
+</body>
+</html>

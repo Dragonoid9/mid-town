@@ -8,42 +8,46 @@ import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
 import com.rac.ktm.midtown.entity.User;
 import com.rac.ktm.midtown.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImplementation(UserRepository userRepository) {
+    public UserServiceImplementation(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder   = passwordEncoder;
         this.userRepository = userRepository;
     }
 
     @Override
     public UserDto registerUser(UserDto userDto) {
+
+        // Encrypt the password
+        String encryptedPassword = passwordEncoder.encode(userDto.getPassword());
+        userDto.setPassword(encryptedPassword);
+
         User user = new User();
         user.setName(userDto.getName());
         user.setUserName(userDto.getUserName());
         user.setEmail(userDto.getEmail());
         user.setPhoneNumber(userDto.getPhoneNumber());
         user.setPassword(userDto.getPassword());
+        user.setRole("user");
         userRepository.save(user);
         return userDto;
     }
 
     @Override
     public LoginResponseDto authenticateUser(LoginRequestDto loginRequestDto) {
-        String identifier = loginRequestDto.getIdentifier();
-        String password = loginRequestDto.getPassword();
-        if (identifier == null || identifier.isEmpty()) {
-            return null;
-        }
-
-        User user = userRepository.findByUserNameOrEmail(identifier, password);
-
-        if (user != null && user.getPassword().equals(password)) {
-            LoginResponseDto loginResponseDto = new LoginResponseDto();
-            loginResponseDto.setUserName(user.getUserName());
-            return loginResponseDto;
+        User user = userRepository.findByIdentifier(loginRequestDto.getIdentifier());
+        if (user != null && passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+            // Create and return a response DTO or token as per your requirement
+            LoginResponseDto responseDto = new LoginResponseDto();
+            responseDto.setUserName(user.getUserName());
+            responseDto.setRole(user.getRole());
+            return responseDto;
         }
         return null;
     }
@@ -65,10 +69,10 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public boolean verifyPassword(String userName, String currentPassword) {
-        String identifier = userName;
-        String password = currentPassword;
-        User user = userRepository.findByUserNameOrEmail(identifier, password);
-        return user != null;
+        User user = userRepository.findByUserName(userName);
+            // Compare the hashed password in the database with the plaintext password
+            return passwordEncoder.matches(currentPassword, user.getPassword());
+
     }
 
     @Override

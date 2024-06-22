@@ -12,6 +12,9 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     @Query("SELECT u FROM test u WHERE (u.userName = :identifier OR u.email = :identifier) AND u.password = :password")
     User findByUserNameOrEmail(@Param("identifier") String identifier, @Param("password") String password);
 
+    @Query("SELECT u FROM test u WHERE (u.userName = :identifier OR u.email = :identifier)")
+    User findByIdentifier(@Param("identifier") String identifier);
+
     User findByUserName(String userName);
 
     @Modifying

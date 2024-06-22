@@ -5,18 +5,25 @@ import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
 import com.rac.ktm.midtown.dto.requestDto.ProfileRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
+import com.rac.ktm.midtown.entity.Post;
+import com.rac.ktm.midtown.service.PostService;
 import com.rac.ktm.midtown.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/rac")
 public class UserController {
 
     private final UserService userService;
+    @Autowired
+    private  PostService postService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -56,6 +63,8 @@ public class UserController {
     @GetMapping("/admin")
     public String showAdminPage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        List<Post> posts = postService.findAll();
+        model.addAttribute("posts", posts);
         return "admin";
     }
 
@@ -100,6 +109,7 @@ public class UserController {
             if (isAuthenticated != null) {
                 session.setAttribute("isLoggedIn", true);  // Set login flag in session
                 session.setAttribute("user", isAuthenticated.getUserName());
+                session.setAttribute("role", isAuthenticated.getRole());
                 session.removeAttribute("passwordError");
                 model.addAttribute("loginError", null);
                 return "redirect:/rac/homePage";  // Redirect to prevent form re-submission issues
