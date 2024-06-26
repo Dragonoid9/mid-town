@@ -1,7 +1,9 @@
 package com.rac.ktm.midtown.repository;
 
 import com.rac.ktm.midtown.entity.Post;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,4 +24,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByDateAndLocation(LocalDate date, String location);
 
     List<Post> findByDate(LocalDate eventDate);
+
+    Page <Post> findTopByOrderByCreatedDateDesc(Pageable pageable);
+
+
 }

@@ -3,6 +3,9 @@ package com.rac.ktm.midtown.service;
 import com.rac.ktm.midtown.entity.Post;
 import com.rac.ktm.midtown.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +22,12 @@ public class PostService {
 
     public List<Post> findAll() {
         return postRepository.findAllByOrderByCreatedDateDesc();
+    }
+    public Page<Post> findLatest(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Post> posts= postRepository.findTopByOrderByCreatedDateDesc(pageable);
+        System.out.println("Fetched " + posts.getContent() + " posts");
+        return posts;
     }
 
     public Post findById(Long id) {

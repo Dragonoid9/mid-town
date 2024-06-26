@@ -15,6 +15,7 @@ import com.rac.ktm.midtown.service.PostService;
 import com.rac.ktm.midtown.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,12 +45,23 @@ public class UserController {
     public String showHomePage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         model.addAttribute("loginError", null);
+
+        Page<Post> posts = postService.findLatest(6);  // Get the latest 6 posts
+        model.addAttribute("posts", posts);
+
+        Page<Podcast> podcasts = podcastService.findLatest(3);  // Get the latest 3 podcasts
+        model.addAttribute("podcasts", podcasts);
+
+        Page<News> news = newsService.findLatest(3);  // Get the latest 3 news
+        model.addAttribute("news", news);
         return "homePage";
     }
 
     @GetMapping("/events")
     public String showEvents(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        List<Post> posts = postService.findAll();
+        model.addAttribute("posts", posts);
         return "events";
     }
 

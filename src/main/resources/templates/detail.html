@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAC Ktm Mid-Town Events</title>
+    <title>RAC Ktm Mid-Town PodCast</title>
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/footer.css">
@@ -15,65 +15,69 @@
             width: 100%;
             max-width: 1200px;
             margin: auto;
+            margin-top: 20px; /* Add margin-top to create space between navbar and content */
+            margin-bottom: 40px;
         }
-        .events-grid {
+        .post-detail {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
+            position: relative; /* Enable positioning */
+            border: 1px solid #ddd; /* Light border */
+            padding: 20px; /* Padding for content */
+            background-color: #f9f9f9; /* Background color */
         }
 
-        .event-card {
-            width: calc(33.333% - 20px);
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-
-        .event-card:hover {
-            transform: scale(1.05);
-        }
-
-        .event-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .event-card-body {
-            padding: 15px;
-        }
-
-        .event-card-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .event-card-text {
+        .created-date {
             font-size: 14px;
-            margin-bottom: 5px;
-            color: #666;
+            color: #131313;
         }
 
-        .event-card a {
-            text-decoration: none;
-            color: inherit;
+        .post-header {
+            flex: 1 1 100%; /* Full width on smaller screens, wrap to new line on larger screens */
+            margin-top: 20px; /* Adjust top margin */
         }
 
-        @media (max-width: 768px) {
-            .event-card {
-                width: calc(50% - 10px);
-            }
+        .post-header h1 {
+            font-size: 32px; /* Larger font size for title */
+            margin-bottom: 10px; /* Add space below title */
         }
 
-        @media (max-width: 480px) {
-            .event-card {
-                width: 100%;
-            }
+        .post-header div {
+            margin-bottom: 10px; /* Add space between items */
+            font-size: 18px;
+        }
+
+        .post-content {
+            flex: 1 1 100%; /* Full width */
+            margin-top: 20px; /* Adjust top margin */
+        }
+
+        .post-content h2 {
+            font-size: 24px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .post-image-container {
+            position: absolute; /* Position image container */
+            top: 10px; /* Adjust top position */
+            right: 10px; /* Adjust right position */
+            width: 200px; /* Fixed width for image container */
+            max-width: 100%; /* Ensure it does not exceed container width */
+        }
+
+        .post-image {
+            width: 100%; /* Make image responsive */
+            max-width: 200px; /* Limit image width */
+            height: auto; /* Maintain aspect ratio */
+            display: block;
+        }
+
+        .post-content div {
+            margin-top: 20px;
+            clear: both;
+            word-wrap: break-word;
         }
     </style>
     <script>
@@ -110,9 +114,9 @@
 <div class="navbar">
     <ul>
         <li class="nav-item"><a class="nav-link" href="/rac/homePage">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/events">Events</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/news">News</a></li>
-        <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Podcast</a></li>
         <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
         <li class="nav-item" th:if="${isLoggedIn} and ${session.role} == 'admin'"><a class="nav-link" href="/rac/admin">Admin</a></li>
     </ul>
@@ -143,20 +147,22 @@
 </div>
 
 <div class="container">
-    <h1>Our Events</h1>
-    <div class="events-grid">
-        <div th:each="post : ${posts}" class="event-card">
-            <a th:href="@{/rac/post/detail/{id}(id=${post.id})}">
-                <img th:src="${post.imageUrl}" alt="Event Image">
-                <div class="event-card-body">
-                    <h2 class="event-card-title" th:text="${post.title}"></h2>
-                    <p class="event-card-text">Committee: <span th:text="${post.category}"></span></p>
-                    <p class="event-card-text">Event Date: <span th:text="${post.date}"></span></p>
-                    <p class="event-card-text">Event Location: <span th:text="${post.location}"></span></p>
-                    <p class="event-card-text">Event Time: <span th:text="${post.startTime}"></span></p>
-                    <p class="event-card-text">Event Duration: <span th:text="${post.durationHours}"></span> hours</p>
-                </div>
-            </a>
+    <div class="created-date"><strong>Created Date:</strong> <span th:text="${post.createdDate}">Created Date</span></div>
+    <div class="post-detail">
+        <div class="post-header">
+            <h1 th:text="${post.title}">Post Title</h1>
+            <div><strong>Committee:</strong> <span th:text="${post.category}">Committee</span></div>
+            <div><strong>Event Date:</strong> <span th:text="${post.date}">Event Date</span></div>
+            <div><strong>Event Location:</strong> <span th:text="${post.location}">Event Location</span></div>
+            <div><strong>Event Time:</strong> <span th:text="${post.startTime}">Event Time</span></div>
+            <div><strong>Event Duration:</strong> <span th:text="${post.durationHours}">Event Duration</span> hours</div>
+        </div>
+        <div class="post-content">
+            <h2>Description</h2>
+            <div th:utext="${post.description}">Post Content</div>
+        </div>
+        <div class="post-image-container">
+            <img class="post-image" th:src="@{${post.imageUrl}}" alt="Post Image">
         </div>
     </div>
 </div>

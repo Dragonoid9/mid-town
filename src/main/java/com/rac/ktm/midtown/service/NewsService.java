@@ -3,6 +3,9 @@ package com.rac.ktm.midtown.service;
 import com.rac.ktm.midtown.entity.News;
 import com.rac.ktm.midtown.repository.NewsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,11 @@ public class NewsService {
     public List<News> findAll() {
         return newsRepository.findAllByOrderByCreatedDateDesc();
     }
+    public Page<News> findLatest(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return newsRepository.findTopByOrderByCreatedDateDesc(pageable);
+    }
+
 
     public News findById(Long id) {
         return newsRepository.findById(id).orElseThrow(() -> new RuntimeException("News not found"));

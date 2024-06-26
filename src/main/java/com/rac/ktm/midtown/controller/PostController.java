@@ -25,6 +25,15 @@ public class PostController {
 
     private final String UPLOAD_DIR = "src/main/resources/static/images/posts/";
 
+    @GetMapping("/detail/{id}")
+    public String showPostDetail(@PathVariable("id") Long id, Model model) {
+        // Retrieve post from service
+        Post post = postService.findById(id);
+        // Add post object to model
+        model.addAttribute("post", post);
+        return "detail"; // Assuming "postDetail.html" is your view template
+    }
+
     @GetMapping("/listpost")
     public String adminPage(Model model) {
         List<Post> posts = postService.findAll();

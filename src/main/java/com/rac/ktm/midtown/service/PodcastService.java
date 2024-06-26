@@ -3,6 +3,9 @@ package com.rac.ktm.midtown.service;
 import com.rac.ktm.midtown.entity.Podcast;
 import com.rac.ktm.midtown.repository.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,6 +19,10 @@ public class PodcastService {
 
     public List<Podcast> findAll() {
         return podcastRepository.findAllByOrderByCreatedDateDesc();
+    }
+    public Page<Podcast> findLatest(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return podcastRepository.findTopByOrderByCreatedDateDesc(pageable);
     }
 
     public Podcast findById(Long id) {
