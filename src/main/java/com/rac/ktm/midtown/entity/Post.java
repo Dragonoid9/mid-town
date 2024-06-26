@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity(name="posts")
 @Data
@@ -18,13 +19,16 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String title;
     private LocalDate date;
+    private LocalTime startTime;
+    private double durationHours; // Duration in hours
     private String location;
     @Column(columnDefinition = "TEXT")
     private String description;
     private String category;
-    private String status;
+
 
     private String createdBy;
     private String updatedBy;

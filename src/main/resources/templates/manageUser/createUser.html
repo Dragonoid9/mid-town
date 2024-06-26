@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAC Ktm Mid-Town Admin</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/navcircle.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <script src="/javascript/circle.js" defer></script>
+    <style>
+        /* Utility classes */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form div {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"] {
+            width: calc(100% - 22px); /* Adjusted width */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+            box-sizing: border-box; /* Ensures padding is included in width calculation */
+        }
+
+        form input[type="text"]:focus,
+        form input[type="email"]:focus,
+        form input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        form a {
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        form a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        function validateRegistrationForm() {
+            const username = document.querySelector('input[name="userName"]');
+            const password = document.querySelector('input[name="password"]');
+            const email = document.querySelector('input[name="email"]');
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]');
+
+            const usernamePattern = /^[A-Za-z][A-Za-z0-9]*$/;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phonePattern = /^(97|98)\d{8}$/;
+
+            if (!username.value.match(usernamePattern)) {
+                alert("Username must start with a letter and contain only letters and numbers.");
+                return false;
+            }
+
+            if (!password.value.match(passwordPattern)) {
+                alert("Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+                return false;
+            }
+
+            if (!email.value.match(emailPattern)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+
+            if (!phoneNumber.value.match(phonePattern)) {
+                alert("Mobile number must be 10 digits long and start with 97 or 98.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+<div class="header-content">
+    <!-- Logo Image -->
+    <img src="/images/midtown.png" alt="Rotaract Club Logo" class="nav-logo">
+    <!-- Club Title -->
+    <h2 class="header-title">Rotaract Club of Kathmandu Mid-Town</h2>
+</div>
+
+<div class="navbar">
+    <ul>
+        <li class="nav-item"><a class="nav-link" href="/rac/homePage">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/events">Events</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/news">News</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/podcast">Podcast</a></li>
+        <li class="nav-item"><a class="nav-link" href="/rac/about">About</a></li>
+        <li class="nav-item" th:if="${isLoggedIn}"><a class="nav-link" href="#">Admin</a></li>
+    </ul>
+    <div class="user-menu" th:if="${isLoggedIn}">
+        <div class="user-circle" onclick="toggleDropdownMenu()">
+            <span th:text="${session.user.charAt(0)}">U</span> <!-- Displays the first letter of the username -->
+        </div>
+        <div class="dropdown-menu" id="userDropdown">
+            <a href="/rac/profile">Profile</a>
+            <a href="/rac/logout">Logout</a>
+        </div>
+    </div>
+</div>
+<div class="admin-container">
+    <div class="sidebar">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/rac/post/listpost">Events</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/news/listnews">News</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/podcast/listpodcast">Podcast</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/user/listusers">Users</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <section>
+            <h2>User Management</h2>
+            <h1>Create New User</h1>
+            <form th:action="@{rac/user/create}" th:object="${userDto}" method="post" onsubmit="return validateRegistrationForm()" >
+                <div>
+                    <label>Username</label>
+                    <input type="text" name="userName" th:field="*{userName}" required />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" name="email" th:field="*{email}" required />
+                </div>
+                <div>
+                    <label>Full Name</label>
+                    <input type="text" name="name" th:field="*{name}" required />
+                </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input type="text" name="phoneNumber" th:field="*{phoneNumber}" required />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input type="password" name="password"  th:field="*{password}" required />
+                </div>
+                <div>
+                    <button type="submit">Save</button>
+                    <a th:href="@{/rac/user/listusers}">Cancel</a>
+                </div>
+                <div th:if="${registrationError}" class="error-message">
+                    <p th:text="${registrationError}"></p>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 Rotaract Club of Kathmandu Mid-Town. All rights reserved.</p>
+</footer>
+</body>
+</html>

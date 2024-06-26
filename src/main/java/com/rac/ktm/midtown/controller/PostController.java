@@ -21,7 +21,8 @@ public class PostController {
 
     @Autowired
     private PostService postService;
-    private final String UPLOAD_DIR = "src/main/resources/static/images/posts/";
+
+
     @GetMapping("/listpost")
     public String adminPage(Model model) {
         List<Post> posts = postService.findAll();
@@ -36,23 +37,23 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public String createEvent(@ModelAttribute Post post, @RequestParam("imageFile") MultipartFile file) throws IOException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!file.isEmpty()) {
-            try {
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                Path path = Paths.get(UPLOAD_DIR, fileName);
-                Files.createDirectories(path.getParent()); // Ensure the directory exists
-                Files.write(path, file.getBytes()); // Write the file to the specified path
-                post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
+    public String createEvent(@ModelAttribute Post post,
+                              @RequestParam("imageFile") MultipartFile file,
+                              Model model,@RequestParam("username")String username) {
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
-            }
+        try {
+            handleFileUpload(post, file);
+            postService.save(post, username);
+        } catch (IOException e) {
+            model.addAttribute("error", "Failed to upload file: " + e.getMessage());
+            model.addAttribute("post", post); // Add post object to retain user input
+            return "manageEvent/eventForm";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("post", post); // Add post object to retain user input
+            return "manageEvent/eventForm";
         }
 
-        postService.save(post, username);
         return "redirect:/rac/post/listpost";
     }
 
@@ -64,24 +65,22 @@ public class PostController {
     }
 
     @PostMapping("/edit")
-    public String editEvent(@ModelAttribute Post post, @RequestParam("imageFile") MultipartFile file) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!file.isEmpty()) {
-            try {
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                Path path = Paths.get(UPLOAD_DIR, fileName);
-                Files.createDirectories(path.getParent()); // Ensure the directory exists
-                Files.write(path, file.getBytes()); // Write the file to the specified path
-                post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
-            }
+    public String editEvent(@ModelAttribute Post post,
+                            @RequestParam("imageFile") MultipartFile file,
+                            @RequestParam("username") String username,
+                            Model model) {
+        try {
+            handleFileUpload(post, file);
+            postService.save(post, username);
+        } catch (IOException e) {
+            model.addAttribute("error", "Failed to upload file: " + e.getMessage());
+            model.addAttribute("post", post); // Add post object to retain user input
+            return "manageEvent/eventForm";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("post", post); // Add post object to retain user input
+            return "manageEvent/eventForm";
         }
-
-        postService.save(post, username);
         return "redirect:/rac/post/listpost";
     }
 
@@ -89,5 +88,16 @@ public class PostController {
     public String deleteEvent(@PathVariable Long id) {
         postService.deleteById(id);
         return "redirect:/rac/post/listpost";
+    }
+
+    private void handleFileUpload(Post post, MultipartFile file) throws IOException {
+        String UPLOAD_DIR = "src/main/resources/static/images/posts/";
+        if (!file.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path path = Paths.get(UPLOAD_DIR, fileName);
+            Files.createDirectories(path.getParent()); // Ensure the directory exists
+            Files.write(path, file.getBytes()); // Write the file to the specified path
+            post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
+        }
     }
 }

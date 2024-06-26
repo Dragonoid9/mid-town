@@ -53,12 +53,14 @@
             <li class="nav-item"><a class="nav-link" href="/rac/post/listpost">Events</a></li>
             <li class="nav-item"><a class="nav-link" href="/rac/news/listnews">News</a></li>
             <li class="nav-item"><a class="nav-link" href="/rac/podcast/listpodcast">Podcast</a></li>
+            <li class="nav-item"><a class="nav-link" href="/rac/user/listusers">Users</a></li>
         </ul>
     </div>
     <div class="content">
         <section>
             <h2>Event Management</h2>
             <h1 th:text="${post.id == null ? 'Create Event' : 'Edit Event'}"></h1>
+            <!-- Form action dynamically set based on whether post.id is null -->
             <form th:action="@{/rac/post/create(username=${session.user})}" th:object="${post}" method="post" enctype="multipart/form-data">
                 <input type="hidden" th:field="*{id}" />
                 <div>
@@ -74,6 +76,14 @@
                     <input type="text" th:field="*{location}" required />
                 </div>
                 <div>
+                    <label>Start Time</label>
+                    <input type="time" th:field="*{startTime}" required />
+                </div>
+                <div>
+                    <label>Duration (hours)</label>
+                    <input type="number" min="1" step="0.5" th:field="*{durationHours}" required />
+                </div>
+                <div>
                     <label>Description</label>
                     <textarea th:field="*{description}" required></textarea>
                 </div>
@@ -87,16 +97,12 @@
                     </select>
                 </div>
                 <div>
-                    <label>Status</label>
-                    <select th:field="*{status}" required>
-                        <option value="Upcoming">Upcoming</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <div>
                     <label>Image</label>
                     <input type="file" name="imageFile" required />
+                </div>
+                <!-- Error message display -->
+                <div th:if="${error}" class="error-message">
+                    <p th:text="${error}" class="error-text"></p>
                 </div>
                 <div>
                     <button type="submit">Save</button>

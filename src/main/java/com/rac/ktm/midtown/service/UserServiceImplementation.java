@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
@@ -21,8 +23,19 @@ public class UserServiceImplementation implements UserService {
         this.userRepository = userRepository;
     }
 
+
     @Override
     public UserDto registerUser(UserDto userDto) {
+
+        if (userRepository.existsByUserName(userDto.getUserName())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+        if (userRepository.existsByPhoneNumber(userDto.getPhoneNumber())) {
+            throw new IllegalArgumentException("Phone number already exists");
+        }
 
         // Encrypt the password
         String encryptedPassword = passwordEncoder.encode(userDto.getPassword());
@@ -77,13 +90,28 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     @Transactional
-    public void updateProfile(ProfileResponseDto profileResponseDto) {
+    public void updateProfile(ProfileResponseDto profileResponseDto,String currentPassword) {
         String userName = profileResponseDto.getUserName();
         String name = profileResponseDto.getName();
         String email = profileResponseDto.getEmail();
         String phoneNumber = profileResponseDto.getPhoneNumber();
+        User user = userRepository.findByUserName(userName);
+
+        if (user == null || !passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("⚠ Current password is incorrect. ⚠");
+        }
+
+        if (userRepository.existsByEmail(email) && !user.getEmail().equals(email)) {
+            throw new IllegalArgumentException("⚠ Email already exists. ⚠");
+        }
+
+        if (userRepository.existsByPhoneNumber(phoneNumber) && !user.getPhoneNumber().equals(phoneNumber)) {
+            throw new IllegalArgumentException("⚠ Phone number already exists. ⚠");
+        }
+
         userRepository.updateProfile(name, email, phoneNumber, userName);
     }
+
 
 
 }

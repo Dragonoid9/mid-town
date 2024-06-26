@@ -5,6 +5,9 @@ import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
 import com.rac.ktm.midtown.dto.requestDto.ProfileRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
+import com.rac.ktm.midtown.entity.User;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -15,5 +18,6 @@ public interface UserService {
     boolean verifyPassword(String userName, String currentPassword);
 
 
-    void updateProfile(ProfileResponseDto profileResponseDto);
+    void updateProfile(ProfileResponseDto profileResponseDto,String currentPassword);
+
 }

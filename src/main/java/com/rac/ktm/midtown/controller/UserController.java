@@ -6,6 +6,7 @@ import com.rac.ktm.midtown.dto.requestDto.ProfileRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
 import com.rac.ktm.midtown.entity.Post;
+import com.rac.ktm.midtown.entity.User;
 import com.rac.ktm.midtown.service.PostService;
 import com.rac.ktm.midtown.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -23,7 +24,7 @@ public class UserController {
 
     private final UserService userService;
     @Autowired
-    private  PostService postService;
+    private PostService postService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -84,12 +85,12 @@ public class UserController {
 
             userService.registerUser(userDto);
             return "homePage";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("registrationError", e.getMessage());
+            return "registrationPage";
         } catch (Exception e) {
-            // Log the exception
-            e.printStackTrace();
-            // Pass error message to the error page
-            model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
-            return "errorPage";
+            model.addAttribute("registrationError", "An unexpected error occurred. Please try again.");
+            return "registrationPage";
         }
     }
 
@@ -148,28 +149,24 @@ public class UserController {
     }
 
     @PostMapping("/updateProfile")
-    public String updateProfile(@ModelAttribute("profileResponseDto") ProfileResponseDto profileResponseDto,
-                                @RequestParam("currentPassword") String currentPassword,
-                                HttpSession session,
-                                Model model) {
+    public String updateProfile(@ModelAttribute("profileResponseDto") ProfileResponseDto profileResponseDto, @RequestParam("currentPassword") String currentPassword, HttpSession session, Model model) {
         try {
-            // Perform password verification here
-            if (!userService.verifyPassword(profileResponseDto.getUserName(), currentPassword)) {
-                model.addAttribute("passwordError", "⚠ Incorrect current password ⚠");
-                return "profile"; // Return to the profile page with an error message
-            }
-
-            // Update profile details if password verification is successful
-            userService.updateProfile(profileResponseDto);
-
+            userService.updateProfile(profileResponseDto, currentPassword);
             return "redirect:/rac/homePage"; // Redirect to the home page after successful update
+        } catch (IllegalArgumentException e) {
+            // Handle specific validation errors and pass appropriate error messages to the view
+            if (e.getMessage().contains("Email already exists")) {
+                model.addAttribute("emailError", e.getMessage());
+            } else if (e.getMessage().contains("Phone number already exists")) {
+                model.addAttribute("phoneNumberError", e.getMessage());
+            } else if (e.getMessage().contains("Current password is incorrect")) {
+                model.addAttribute("passwordError", e.getMessage());
+            }
+            return "profile"; // Return to the profile page with an error message
         } catch (Exception e) {
-            // Handle any exceptions or errors
-            e.printStackTrace();
             model.addAttribute("errorMessage", "⚠ An unexpected error occurred. Please try again. ⚠");
-            return "profile";
-
-
+            return "profile"; // Return to the profile page with an error message
         }
+
     }
 }
