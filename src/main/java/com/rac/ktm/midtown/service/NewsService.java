@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Service
 public class NewsService {
 
@@ -25,13 +24,13 @@ public class NewsService {
 
     public void save(News news, String currentUser) {
         if (news.getId() == null) {
-            // Creating a new post
+            validateNewNews(news);
             news.setCreatedDate(LocalDateTime.now());
             news.setCreatedBy(currentUser);
             news.setUpdatedBy(null); // updatedBy is null on creation
         } else {
-            // Updating an existing post
-            News existingNews = newsRepository.findById(news.getId()).orElseThrow(() -> new RuntimeException("Event not found"));
+            validateUpdatedNews(news);
+            News existingNews = newsRepository.findById(news.getId()).orElseThrow(() -> new RuntimeException("News not found"));
             news.setCreatedDate(existingNews.getCreatedDate()); // Retain original created date
             news.setCreatedBy(existingNews.getCreatedBy()); // Retain original created by
             news.setUpdatedDate(LocalDateTime.now());
@@ -42,5 +41,29 @@ public class NewsService {
 
     public void deleteById(Long id) {
         newsRepository.deleteById(id);
+    }
+
+    private void validateNewNews(News news) {
+        if (newsRepository.findByTitle(news.getTitle()).isPresent()) {
+            throw new IllegalArgumentException("News with the same title already exists.");
+        }
+
+        if (newsRepository.findAll().stream().anyMatch(n -> n.getLink().equals(news.getLink()))) {
+            throw new IllegalArgumentException("News with the same link already exists.");
+        }
+    }
+
+    private void validateUpdatedNews(News news) {
+        newsRepository.findByTitle(news.getTitle()).ifPresent(existingNews -> {
+            if (!existingNews.getId().equals(news.getId())) {
+                throw new IllegalArgumentException("News with the same title already exists.");
+            }
+        });
+
+        if (newsRepository.findAll().stream()
+                .filter(n -> !n.getId().equals(news.getId()))
+                .anyMatch(n -> n.getLink().equals(news.getLink()))) {
+            throw new IllegalArgumentException("News with the same link already exists.");
+        }
     }
 }

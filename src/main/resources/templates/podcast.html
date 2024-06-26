@@ -16,6 +16,45 @@
             max-width: 1200px;
             margin: auto;
         }
+        .news-item {
+            display: flex;
+            flex-direction: row-reverse; /* Reverse the order of items */
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .news-content {
+            flex: 1; /* To take up remaining space */
+        }
+
+        .news-image {
+            max-width: 270px; /* Adjust width as needed */
+            height: auto;
+            margin-right: 20px; /* Margin between image and text */
+        }
+
+        .news-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .news-description {
+            margin-top: 10px;
+        }
+
+        .news-video-link {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #007bff; /* Blue color for link */
+            text-decoration: none; /* Remove underline */
+            display: inline-block;
+        }
+
+        .news-video-link:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
     </style>
     <script>
         function validateLoginForm() {
@@ -85,7 +124,16 @@
 
 <div class="container">
     <h1>Welcome to Our PodCast Page!</h1>
-    <p>Feel free to explore the features of our application!</p>
+    <div th:each="podcast : ${podcasts}">
+        <div class="news-item">
+            <div class="news-content">
+                <div class="news-title" th:text="${podcast.title}">News Title</div>
+                <div class="news-description" th:utext="${podcast.description}">News Description</div>
+                <a class="news-video-link" th:href="${podcast.link}" target="_blank">Watch Video</a>
+            </div>
+            <img class="news-image" th:src="@{${podcast.imageUrl}}" alt="News Image"/>
+        </div>
+    </div>
 </div>
 <footer class="footer">
     <p>© 2024 Rotaract Club of Kathmandu Mid-Town. All rights reserved.</p>

@@ -15,4 +15,8 @@ public interface PodcastRepository extends JpaRepository<Podcast, Long> {
     List<Podcast> findAll();
 
     List<Podcast> findAllByOrderByCreatedDateDesc();
+
+    Optional<Podcast> findByTitle(String title);
+
+    Optional<Podcast> findByLink(String link);
 }

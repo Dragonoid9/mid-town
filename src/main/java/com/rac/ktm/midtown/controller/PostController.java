@@ -1,5 +1,6 @@
 package com.rac.ktm.midtown.controller;
 
+import com.rac.ktm.midtown.entity.News;
 import com.rac.ktm.midtown.entity.Post;
 import com.rac.ktm.midtown.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    private final String UPLOAD_DIR = "src/main/resources/static/images/posts/";
 
     @GetMapping("/listpost")
     public String adminPage(Model model) {
@@ -41,8 +43,19 @@ public class PostController {
                               @RequestParam("imageFile") MultipartFile file,
                               Model model,@RequestParam("username")String username) {
 
+
         try {
-            handleFileUpload(post, file);
+            if (!file.isEmpty()) {
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR, fileName);
+                Files.createDirectories(path.getParent()); // Ensure the directory exists
+                Files.write(path, file.getBytes()); // Write the file to the specified path
+                post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
+            }
+            if (post.getId() != null) {
+                Post existingPost = postService.findById(post.getId());
+                post.setImageUrl(existingPost.getImageUrl()); // Retain the existing image URL
+            }
             postService.save(post, username);
         } catch (IOException e) {
             model.addAttribute("error", "Failed to upload file: " + e.getMessage());

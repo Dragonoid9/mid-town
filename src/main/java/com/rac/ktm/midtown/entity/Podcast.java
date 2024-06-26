@@ -15,11 +15,11 @@ public class Podcast {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+@Column(unique=true)
     private String title;
     @Column(columnDefinition = "TEXT")
     private String description;
-    @Column(columnDefinition = "TEXT")
+    @Column(unique = true, columnDefinition = "TEXT")
     private String link;
 
     private String createdBy;

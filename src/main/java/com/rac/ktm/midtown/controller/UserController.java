@@ -5,8 +5,12 @@ import com.rac.ktm.midtown.dto.requestDto.LoginRequestDto;
 import com.rac.ktm.midtown.dto.requestDto.ProfileRequestDto;
 import com.rac.ktm.midtown.dto.responseDto.LoginResponseDto;
 import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
+import com.rac.ktm.midtown.entity.News;
+import com.rac.ktm.midtown.entity.Podcast;
 import com.rac.ktm.midtown.entity.Post;
 import com.rac.ktm.midtown.entity.User;
+import com.rac.ktm.midtown.service.NewsService;
+import com.rac.ktm.midtown.service.PodcastService;
 import com.rac.ktm.midtown.service.PostService;
 import com.rac.ktm.midtown.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -25,6 +29,12 @@ public class UserController {
     private final UserService userService;
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private NewsService newsService;
+    @Autowired
+    private PodcastService podcastService;
+
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -46,12 +56,16 @@ public class UserController {
     @GetMapping("/news")
     public String showNewsPage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        List<News> news = newsService.findAll();
+        model.addAttribute("news", news);
         return "news";
     }
 
     @GetMapping("/podcast")
     public String showPodcastPage(Model model, HttpSession session) {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
+        List<Podcast> podcasts = podcastService.findAll();
+        model.addAttribute("podcasts", podcasts);
         return "podcast";
     }
 

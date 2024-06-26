@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-
 @Entity(name="news")
 @Data
 @NoArgsConstructor
@@ -18,10 +17,13 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String title;
+
     @Column(columnDefinition = "TEXT")
     private String description;
-    @Column(columnDefinition = "TEXT")
+
+    @Column(unique = true, columnDefinition = "TEXT")
     private String link;
 
     private String createdBy;
@@ -29,6 +31,7 @@ public class News {
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
 }

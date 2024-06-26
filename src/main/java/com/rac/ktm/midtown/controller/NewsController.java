@@ -38,23 +38,30 @@ public class NewsController {
     }
 
     @PostMapping("/create")
-    public String createNews(@ModelAttribute News news, @RequestParam("imageFile") MultipartFile file) throws IOException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!file.isEmpty()) {
-            try {
+    public String createNews(@ModelAttribute News news, @RequestParam("imageFile") MultipartFile file, Model model,@RequestParam("username")String username) {
+        try {
+            if (!file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR, fileName);
                 Files.createDirectories(path.getParent()); // Ensure the directory exists
                 Files.write(path, file.getBytes()); // Write the file to the specified path
                 news.setImageUrl("/images/news/" + fileName); // Set the URL for the image
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
+            }if (news.getId() != null) {
+                News existingNews = newsService.findById(news.getId());
+                news.setImageUrl(existingNews.getImageUrl()); // Retain the existing image URL
             }
-        }
 
-        newsService.save(news, username);
-        return "redirect:/rac/news/listnews";
+            newsService.save(news, username);
+            return "redirect:/rac/news/listnews";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("news", news);
+            return "manageNews/newsForm";
+        } catch (IOException e) {
+            model.addAttribute("errorMessage", "File upload error: " + e.getMessage());
+            model.addAttribute("news", news);
+            return "manageNews/newsForm";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -65,24 +72,30 @@ public class NewsController {
     }
 
     @PostMapping("/edit")
-    public String editNews(@ModelAttribute News news, @RequestParam("imageFile") MultipartFile file) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!file.isEmpty()) {
-            try {
+    public String editNews(@ModelAttribute News news, @RequestParam("imageFile") MultipartFile file, Model model, @RequestParam("username") String username) {
+        News existingNews = newsService.findById(news.getId());
+        try {
+            if (!file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR, fileName);
                 Files.createDirectories(path.getParent()); // Ensure the directory exists
                 Files.write(path, file.getBytes()); // Write the file to the specified path
                 news.setImageUrl("/images/news/" + fileName); // Set the URL for the image
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
+            }else {
+                news.setImageUrl(existingNews.getImageUrl()); // Retain the existing image URL
             }
-        }
 
-        newsService.save(news, username);
-        return "redirect:/rac/news/listnews";
+            newsService.save(news, username);
+            return "redirect:/rac/news/listnews";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("news", news);
+            return "manageNews/newsForm";
+        } catch (IOException e) {
+            model.addAttribute("errorMessage", "File upload error: " + e.getMessage());
+            model.addAttribute("news", news);
+            return "manageNews/newsForm";
+        }
     }
 
     @GetMapping("/delete/{id}")

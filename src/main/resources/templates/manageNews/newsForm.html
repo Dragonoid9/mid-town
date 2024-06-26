@@ -61,7 +61,7 @@
             <h2>News Management</h2>
             <h1 th:text="${news.id == null ? 'Create News' : 'Edit News'}"></h1>
 
-        <form th:action="@{/rac/news/create}" th:object="${news}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/rac/news/create(username=${session.user})}" th:object="${news}" method="post" enctype="multipart/form-data">
             <input type="hidden" th:if="${news.id}" th:field="*{id}"/>
             <div>
                 <label>Title</label>
@@ -73,7 +73,7 @@
             </div>
             <div>
                 <label for="link">Link</label>
-                <input type="url" id="link" th:field="*{link}"/>
+                <input type="url" id="link" th:field="*{link}" required/>
             </div>
             <div>
                 <label for="imageFile">Image</label>
@@ -85,6 +85,9 @@
             <div>
                 <button type="submit">Save</button>
                 <a th:href="@{/rac/news/listnews}">Cancel</a>
+            </div>
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}" class="error-text"></p>
             </div>
         </form>
         </section>

@@ -1,5 +1,6 @@
 package com.rac.ktm.midtown.controller;
 
+import com.rac.ktm.midtown.entity.News;
 import com.rac.ktm.midtown.entity.Podcast;
 import com.rac.ktm.midtown.service.PodcastService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,23 +38,32 @@ public class PodcastController {
     }
 
     @PostMapping("/create")
-    public String createPodcast(@ModelAttribute Podcast podcast, @RequestParam("imageFile") MultipartFile file) throws IOException {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!file.isEmpty()) {
-            try {
+    public String createPodcast(@ModelAttribute Podcast podcast, @RequestParam("imageFile") MultipartFile file, Model model, @RequestParam("username")String username) {
+
+        try {
+            if (!file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR, fileName);
                 Files.createDirectories(path.getParent()); // Ensure the directory exists
                 Files.write(path, file.getBytes()); // Write the file to the specified path
                 podcast.setImageUrl("/images/podcast/" + fileName); // Set the URL for the image
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
             }
-        }
+            if (podcast.getId() != null) {
+                Podcast existingPodcast = podcastService.findById(podcast.getId());
+                podcast.setImageUrl(existingPodcast.getImageUrl()); // Retain the existing image URL
+            }
 
-        podcastService.save(podcast, username);
-        return "redirect:/rac/podcast/listpodcast";
+            podcastService.save(podcast, username);
+            return "redirect:/rac/podcast/listpodcast";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("podcast", podcast);
+            return "managePodcast/podcastForm";
+        } catch (IOException e) {
+            model.addAttribute("errorMessage", "File upload error: " + e.getMessage());
+            model.addAttribute("podcast", podcast);
+            return "managePodcast/podcastForm";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -64,24 +74,30 @@ public class PodcastController {
     }
 
     @PostMapping("/edit")
-    public String editPodcast(@ModelAttribute Podcast podcast, @RequestParam("imageFile") MultipartFile file) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!file.isEmpty()) {
-            try {
+    public String editPodcast(@ModelAttribute Podcast podcast, @RequestParam("imageFile") MultipartFile file, Model model,@RequestParam("username")String username) {
+        Podcast existingPodcast = podcastService.findById(podcast.getId());
+        try {
+            if (!file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR, fileName);
                 Files.createDirectories(path.getParent()); // Ensure the directory exists
                 Files.write(path, file.getBytes()); // Write the file to the specified path
                 podcast.setImageUrl("/images/podcast/" + fileName); // Set the URL for the image
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Handle file upload error
+            }else {
+                podcast.setImageUrl(existingPodcast.getImageUrl()); // Retain the existing image URL
             }
-        }
 
-        podcastService.save(podcast, username);
-        return "redirect:/rac/podcast/listpodcast";
+            podcastService.save(podcast, username);
+            return "redirect:/rac/podcast/listpodcast";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("podcast", podcast);
+            return "managePodcast/podcastForm";
+        } catch (IOException e) {
+            model.addAttribute("errorMessage", "File upload error: " + e.getMessage());
+            model.addAttribute("podcast", podcast);
+            return "managePodcast/podcastForm";
+        }
     }
 
     @GetMapping("/delete/{id}")

@@ -61,7 +61,7 @@
             <h2>Podcast Management</h2>
             <h1 th:text="${podcast.id == null ? 'Create Postcast' : 'Edit podcast'}"></h1>
 
-        <form th:action="@{/rac/podcast/create}" th:object="${podcast}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/rac/podcast/create(username=${session.user})}" th:object="${podcast}" method="post" enctype="multipart/form-data">
             <input type="hidden" th:if="${podcast.id}" th:field="*{id}"/>
             <div>
                 <label>Title</label>
@@ -73,7 +73,7 @@
             </div>
             <div>
                 <label for="link">Link</label>
-                <input type="url" id="link" th:field="*{link}"/>
+                <input type="url" id="link" th:field="*{link}" required/>
             </div>
             <div>
                 <label for="imageFile">Image</label>
@@ -85,6 +85,9 @@
             <div>
                 <button type="submit">Save</button>
                 <a th:href="@{/rac/podcast/listpodcast}">Cancel</a>
+            </div>
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}" class="error-text"></p>
             </div>
         </form>
         </section>

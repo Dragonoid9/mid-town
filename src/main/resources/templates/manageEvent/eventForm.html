@@ -97,8 +97,11 @@
                     </select>
                 </div>
                 <div>
-                    <label>Image</label>
-                    <input type="file" name="imageFile" required />
+                    <label for="imageFile">Image</label>
+                    <input type="file" id="imageFile" name="imageFile"/>
+                    <div th:if="${post.imageUrl}">
+                        <img th:src="${post.imageUrl}" alt="Current Image" class="img-thumbnail" style="width: 100px;"/>
+                    </div>
                 </div>
                 <!-- Error message display -->
                 <div th:if="${error}" class="error-message">
