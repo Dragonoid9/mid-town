@@ -4,6 +4,7 @@ import com.rac.ktm.midtown.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAll();
 
-    List<Post> findAllByOrderByCreatedDateDesc();
+    List<Post> findAllByOrderByDateDesc();
 
     Optional<Post> findByTitle(String title);
 
@@ -25,6 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByDate(LocalDate eventDate);
 
+    @Query("Select p from posts p order by p.date desc ")
     Page <Post> findTopByOrderByCreatedDateDesc(Pageable pageable);
 
 

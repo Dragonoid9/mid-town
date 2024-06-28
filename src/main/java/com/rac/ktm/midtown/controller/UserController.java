@@ -8,7 +8,6 @@ import com.rac.ktm.midtown.dto.responseDto.ProfileResponseDto;
 import com.rac.ktm.midtown.entity.News;
 import com.rac.ktm.midtown.entity.Podcast;
 import com.rac.ktm.midtown.entity.Post;
-import com.rac.ktm.midtown.entity.User;
 import com.rac.ktm.midtown.service.NewsService;
 import com.rac.ktm.midtown.service.PodcastService;
 import com.rac.ktm.midtown.service.PostService;
@@ -46,7 +45,7 @@ public class UserController {
         model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
         model.addAttribute("loginError", null);
 
-        Page<Post> posts = postService.findLatest(6);  // Get the latest 6 posts
+        Page<Post> posts = postService.findLatest(8);  // Get the latest 8 posts
         model.addAttribute("posts", posts);
 
         Page<Podcast> podcasts = podcastService.findLatest(3);  // Get the latest 3 podcasts

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,9 +20,10 @@ public class PostService {
     private PostRepository postRepository;
 
     public List<Post> findAll() {
-        return postRepository.findAllByOrderByCreatedDateDesc();
+        return postRepository.findAllByOrderByDateDesc();
     }
     public Page<Post> findLatest(int limit) {
+        System.out.println("Limit: "+limit);
         Pageable pageable = PageRequest.of(0, limit);
         Page<Post> posts= postRepository.findTopByOrderByCreatedDateDesc(pageable);
         System.out.println("Fetched " + posts.getContent() + " posts");

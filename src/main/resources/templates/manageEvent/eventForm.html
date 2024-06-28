@@ -18,6 +18,11 @@
             max-width: 1200px;
             margin: auto;
         }
+            .previous-value {
+                font-style: italic;
+                color: #888;
+                margin-left: 10px;
+            }
     </style>
 </head>
 <body>
@@ -68,8 +73,15 @@
                     <input type="text" th:field="*{title}" required />
                 </div>
                 <div>
-                    <label>Date</label>
+                    <div>
+                        <label>Status</label>
+                        <select id="status" name="status" required onchange="updateDateTimeConstraints()">
+                            <option value="Upcoming">Upcoming</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
                     <input type="date" th:field="*{date}" required />
+                    <span th:if="${post.date != null}" class="previous-value">Previous Date: <span th:text="${#temporals.format(post.date, 'yyyy-MM-dd')}"></span></span>
                 </div>
                 <div>
                     <label>Location</label>
@@ -77,7 +89,8 @@
                 </div>
                 <div>
                     <label>Start Time</label>
-                    <input type="time" th:field="*{startTime}" required />
+                    <input type="time" th:field="*{startTime}"  required />
+                    <span th:if="${post.startTime != null}" class="previous-value">Previous Time: <span th:text="${#temporals.format(post.startTime,'hh:mm a')}"></span></span>
                 </div>
                 <div>
                     <label>Duration (hours)</label>
@@ -98,7 +111,7 @@
                 </div>
                 <div>
                     <label for="imageFile">Image</label>
-                    <input type="file" id="imageFile" name="imageFile"/>
+                    <input type="file" id="imageFile" name="imageFile" th:attr="required=${post.id == null}"/>
                     <div th:if="${post.imageUrl}">
                         <img th:src="${post.imageUrl}" alt="Current Image" class="img-thumbnail" style="width: 100px;"/>
                     </div>
@@ -120,4 +133,63 @@
     <p>© 2024 Rotaract Club of Kathmandu Mid-Town. All rights reserved.</p>
 </footer>
 </body>
+<script>
+    function updateDateTimeConstraints() {
+        const status = document.getElementById('status').value;
+        const dateInput = document.getElementById('date');
+        const timeInput = document.getElementById('startTime');
+        const now = new Date();
+        const currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes(); // Current time in HH:MM format
+
+        if (status === 'Completed') {
+            dateInput.removeAttribute('min'); // Remove minimum date constraint
+            dateInput.setAttribute('max', now.toISOString().split('T')[0]);
+            if (dateInput.value === now.toISOString().split('T')[0]) {
+                timeInput.setAttribute('max', currentTime);
+            } else {
+                timeInput.removeAttribute('max');
+            }
+        } else if (status === 'Upcoming') {
+            dateInput.setAttribute('min', now.toISOString().split('T')[0]);
+            if (dateInput.value === now.toISOString().split('T')[0]) {
+                const minTime = pad(now.getHours() + 4) + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+                timeInput.setAttribute('min', minTime);
+            } else {
+                timeInput.removeAttribute('min');
+            }
+        }
+    }
+
+    function validateForm() {
+        const status = document.getElementById('status').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('startTime').value;
+        const now = new Date();
+        const selectedDate = new Date(date + 'T' + time);
+
+        if (status === 'Completed' && selectedDate > now) {
+            alert("Completed events must have a date and time in the past.");
+            return false; // Prevent form submission
+        } else if (status === 'Upcoming' && selectedDate <= now) {
+            alert("Upcoming events must have a date and time at least 4 hours later from the current time.");
+            return false; // Prevent form submission
+        }
+        return true; // Allow form submission
+    }
+
+    function pad(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    document.getElementById('date').addEventListener('change', updateDateTimeConstraints);
+    document.getElementById('status').addEventListener('change', updateDateTimeConstraints);
+    document.querySelector('form').addEventListener('submit', function(event) {
+        if (!validateForm()) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+
+    updateDateTimeConstraints(); // Initial call to set constraints based on default status
+</script>
+
 </html>

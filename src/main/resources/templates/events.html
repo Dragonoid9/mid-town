@@ -15,53 +15,50 @@
             width: 100%;
             max-width: 1200px;
             margin: auto;
+            margin-top: 5px; /* Add margin-top to create space between navbar and content */
+            margin-bottom: 40px; /* Add margin-bottom to create space between content and footer */
         }
         .events-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            justify-content: space-between;
         }
 
         .event-card {
-            width: calc(33.333% - 20px);
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            flex: 1 1 calc(25% - 40px);
+            border: 1px solid #ddd;
+            border-radius: 5px;
             overflow: hidden;
-            transition: transform 0.3s;
+            background-color: #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 520px;
         }
 
         .event-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .event-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
+            width: 93%;
+            height: 320px; /* Adjusted the height of the images */
+            /*object-fit: cover;*/
         }
 
         .event-card-body {
             padding: 15px;
+            max-height: calc(100% - 100px);
         }
 
         .event-card-title {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
             margin-bottom: 10px;
-            color: #333;
         }
 
         .event-card-text {
             font-size: 14px;
             margin-bottom: 5px;
             color: #666;
-        }
-
-        .event-card a {
-            text-decoration: none;
-            color: inherit;
         }
 
         @media (max-width: 768px) {
@@ -74,6 +71,9 @@
             .event-card {
                 width: 100%;
             }
+        }
+        a.section-link{
+            text-decoration: none;
         }
     </style>
     <script>
@@ -146,14 +146,14 @@
     <h1>Our Events</h1>
     <div class="events-grid">
         <div th:each="post : ${posts}" class="event-card">
-            <a th:href="@{/rac/post/detail/{id}(id=${post.id})}">
+            <a th:href="@{/rac/post/detail/{id}(id=${post.id})}" class="section-link">
                 <img th:src="${post.imageUrl}" alt="Event Image">
                 <div class="event-card-body">
                     <h2 class="event-card-title" th:text="${post.title}"></h2>
                     <p class="event-card-text">Committee: <span th:text="${post.category}"></span></p>
                     <p class="event-card-text">Event Date: <span th:text="${post.date}"></span></p>
                     <p class="event-card-text">Event Location: <span th:text="${post.location}"></span></p>
-                    <p class="event-card-text">Event Time: <span th:text="${post.startTime}"></span></p>
+                    <p class="event-card-text">Event Time: <span th:text="${#temporals.format(post.startTime,'hh:mm a')}"></span></p>
                     <p class="event-card-text">Event Duration: <span th:text="${post.durationHours}"></span> hours</p>
                 </div>
             </a>
