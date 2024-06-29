@@ -19,20 +19,19 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
+
     public List<Post> findAll() {
         return postRepository.findAllByOrderByDateDesc();
     }
     public Page<Post> findLatest(int limit) {
-        System.out.println("Limit: "+limit);
         Pageable pageable = PageRequest.of(0, limit);
         Page<Post> posts= postRepository.findTopByOrderByCreatedDateDesc(pageable);
-        System.out.println("Fetched " + posts.getContent() + " posts");
         return posts;
     }
 
     public Post findById(Long id) {
         return postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new RuntimeException("null"));
     }
 
     public void save(Post post, String currentUser) {

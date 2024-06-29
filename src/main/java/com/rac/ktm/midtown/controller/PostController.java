@@ -121,6 +121,7 @@ public class PostController {
         return "redirect:/rac/homePage";
     }
 
+    @GetMapping("/delete/{id}")
     public String deleteEvent(@PathVariable Long id, HttpSession session) {
         if (isAdmin(session)) {
             postService.deleteById(id);

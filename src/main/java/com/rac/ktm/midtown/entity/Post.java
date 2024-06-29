@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity(name="posts")
 @Data
@@ -29,7 +30,6 @@ public class Post {
     private String description;
     private String category;
 
-
     private String createdBy;
     private String updatedBy;
 
@@ -37,4 +37,11 @@ public class Post {
     private LocalDateTime updatedDate;
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Comment> comments;
+
+    public Post(Long postId) {
+        this.id = id;
+    }
 }
