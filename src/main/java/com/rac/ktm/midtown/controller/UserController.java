@@ -88,11 +88,17 @@ public class UserController {
 
     @GetMapping("/admin")
     public String showAdminPage(Model model, HttpSession session) {
-        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
-        List<Post> posts = postService.findAll();
-        model.addAttribute("posts", posts);
-        return "admin";
+        if (session.getAttribute("isLoggedIn") != null && (boolean) session.getAttribute("isLoggedIn")) {
+            String role = (String) session.getAttribute("role");
+            if ("admin".equals(role)) {
+                List<Post> posts = postService.findAll();
+                model.addAttribute("posts", posts);
+                return "admin";
+            }
+        }
+        return "redirect:/rac/homePage";
     }
+
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -163,14 +169,16 @@ public class UserController {
 
     @GetMapping("/profile")
     public String showProfilePage(Model model, HttpSession session, @RequestParam("username") String username) {
-        model.addAttribute("isLoggedIn", session.getAttribute("isLoggedIn") != null);
-        model.addAttribute("userDto", new UserDto());
-        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
-        profileRequestDto.setUserName(username);
-        ProfileResponseDto profileResponseDto = userService.profileRequest(profileRequestDto);
-        model.addAttribute("profileResponseDto", profileResponseDto);
-        session.removeAttribute("passwordError");
-        return "profile";
+        if (session.getAttribute("isLoggedIn") != null && (boolean) session.getAttribute("isLoggedIn")) {
+            model.addAttribute("userDto", new UserDto());
+            ProfileRequestDto profileRequestDto = new ProfileRequestDto();
+            profileRequestDto.setUserName(username);
+            ProfileResponseDto profileResponseDto = userService.profileRequest(profileRequestDto);
+            model.addAttribute("profileResponseDto", profileResponseDto);
+            session.removeAttribute("passwordError");
+            return "profile";
+        }
+        return "redirect:/rac/homePage";
     }
 
     @PostMapping("/updateProfile")

@@ -85,7 +85,7 @@
                     <td th:text="${post.title}"></td>
                     <td th:text="${post.date}"></td>
                     <td th:text="${post.location}"></td>
-                    <td th:text="${post.startTime}"></td>
+                    <td th:text="${#temporals.format(post.startTime,'hh:mm a')}"></td>
                     <td th:text="${post.durationHours}"></td>
                     <td class="description" th:text="${post.description}"></td>
                     <td th:text="${post.category}"></td>

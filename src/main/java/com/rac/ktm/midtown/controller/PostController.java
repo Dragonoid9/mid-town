@@ -3,6 +3,7 @@ package com.rac.ktm.midtown.controller;
 import com.rac.ktm.midtown.entity.News;
 import com.rac.ktm.midtown.entity.Post;
 import com.rac.ktm.midtown.service.PostService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -35,81 +36,97 @@ public class PostController {
     }
 
     @GetMapping("/listpost")
-    public String adminPage(Model model) {
-        List<Post> posts = postService.findAll();
-        model.addAttribute("posts", posts);
-        return "admin";
+    public String adminPage(Model model,HttpSession session) {
+        if (isAdmin(session)) {
+            List<Post> posts = postService.findAll();
+            model.addAttribute("posts", posts);
+            return "admin";
+        }
+        return "redirect:/rac/homePage";
     }
 
     @GetMapping("/create")
-    public String createEventForm(Model model) {
-        model.addAttribute("post", new Post());
-        return "manageEvent/eventForm";
+    public String createEventForm(Model model,HttpSession session) {
+        if (isAdmin(session)) {
+            model.addAttribute("post", new Post());
+            return "manageEvent/eventForm";
+        }
+        return "redirect:/rac/homePage";
     }
 
     @PostMapping("/create")
     public String createEvent(@ModelAttribute Post post,
                               @RequestParam("imageFile") MultipartFile file,
-                              Model model,@RequestParam("username")String username) {
+                              Model model,@RequestParam("username")String username,HttpSession session) {
 
+        if (isAdmin(session)) {
+            try {
+                if (!file.isEmpty()) {
+                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                    Path path = Paths.get(UPLOAD_DIR, fileName);
+                    Files.createDirectories(path.getParent()); // Ensure the directory exists
+                    Files.write(path, file.getBytes()); // Write the file to the specified path
+                    post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
+                }
+                if (post.getId() != null) {
+                    Post existingPost = postService.findById(post.getId());
+                    post.setImageUrl(existingPost.getImageUrl()); // Retain the existing image URL
+                }
+                postService.save(post, username);
+            } catch (IOException e) {
+                model.addAttribute("error", "Failed to upload file: " + e.getMessage());
+                model.addAttribute("post", post); // Add post object to retain user input
+                return "manageEvent/eventForm";
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("error", e.getMessage());
+                model.addAttribute("post", post); // Add post object to retain user input
+                return "manageEvent/eventForm";
+            }
 
-        try {
-            if (!file.isEmpty()) {
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                Path path = Paths.get(UPLOAD_DIR, fileName);
-                Files.createDirectories(path.getParent()); // Ensure the directory exists
-                Files.write(path, file.getBytes()); // Write the file to the specified path
-                post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
-            }
-            if (post.getId() != null) {
-                Post existingPost = postService.findById(post.getId());
-                post.setImageUrl(existingPost.getImageUrl()); // Retain the existing image URL
-            }
-            postService.save(post, username);
-        } catch (IOException e) {
-            model.addAttribute("error", "Failed to upload file: " + e.getMessage());
-            model.addAttribute("post", post); // Add post object to retain user input
-            return "manageEvent/eventForm";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("post", post); // Add post object to retain user input
-            return "manageEvent/eventForm";
+            return "redirect:/rac/post/listpost";
         }
-
-        return "redirect:/rac/post/listpost";
+        return "redirect:/rac/homePage";
     }
 
     @GetMapping("/edit/{id}")
-    public String editEventForm(@PathVariable Long id, Model model) {
-        Post post = postService.findById(id);
-        model.addAttribute("post", post);
-        return "manageEvent/eventForm";
+    public String editEventForm(@PathVariable Long id, Model model,HttpSession session) {
+        if (isAdmin(session)) {
+            Post post = postService.findById(id);
+            model.addAttribute("post", post);
+            return "manageEvent/eventForm";
+        }
+        return "redirect:/rac/homePage";
     }
 
     @PostMapping("/edit")
     public String editEvent(@ModelAttribute Post post,
                             @RequestParam("imageFile") MultipartFile file,
                             @RequestParam("username") String username,
-                            Model model) {
-        try {
-            handleFileUpload(post, file);
-            postService.save(post, username);
-        } catch (IOException e) {
-            model.addAttribute("error", "Failed to upload file: " + e.getMessage());
-            model.addAttribute("post", post); // Add post object to retain user input
-            return "manageEvent/eventForm";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("post", post); // Add post object to retain user input
-            return "manageEvent/eventForm";
+                            Model model,HttpSession session) {
+        if (isAdmin(session)) {
+            try {
+                handleFileUpload(post, file);
+                postService.save(post, username);
+            } catch (IOException e) {
+                model.addAttribute("error", "Failed to upload file: " + e.getMessage());
+                model.addAttribute("post", post); // Add post object to retain user input
+                return "manageEvent/eventForm";
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("error", e.getMessage());
+                model.addAttribute("post", post); // Add post object to retain user input
+                return "manageEvent/eventForm";
+            }
+            return "redirect:/rac/post/listpost";
         }
-        return "redirect:/rac/post/listpost";
+        return "redirect:/rac/homePage";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteEvent(@PathVariable Long id) {
-        postService.deleteById(id);
-        return "redirect:/rac/post/listpost";
+    public String deleteEvent(@PathVariable Long id, HttpSession session) {
+        if (isAdmin(session)) {
+            postService.deleteById(id);
+            return "redirect:/rac/post/listpost";
+        }
+        return "redirect:/rac/homePage";
     }
 
     private void handleFileUpload(Post post, MultipartFile file) throws IOException {
@@ -121,5 +138,10 @@ public class PostController {
             Files.write(path, file.getBytes()); // Write the file to the specified path
             post.setImageUrl("/images/posts/" + fileName); // Set the URL for the image
         }
+    }
+    private boolean isAdmin(HttpSession session) {
+        Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
+        String role = (String) session.getAttribute("role");
+        return isLoggedIn != null && isLoggedIn && "admin".equals(role);
     }
 }
