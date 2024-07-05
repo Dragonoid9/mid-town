@@ -1,5 +1,6 @@
 package com.rac.ktm.midtown.service;
 
+import com.rac.ktm.midtown.entity.Comment;
 import com.rac.ktm.midtown.entity.Post;
 import com.rac.ktm.midtown.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,19 @@ public class PostService {
             post.setCreatedBy(existingPost.getCreatedBy()); // Retain original created by
             post.setUpdatedDate(LocalDateTime.now());
             post.setUpdatedBy(currentUser);
+
+            // Handle comments
+            if (existingPost.getComments() != null) {
+                List<Comment> existingComments = existingPost.getComments();
+                existingComments.clear();
+                if (post.getComments() != null) {
+                    existingComments.addAll(post.getComments());
+                }
+                post.setComments(existingComments);
+            } else {
+                post.setComments(post.getComments() != null ? post.getComments() : new ArrayList<>());
+            }
+
             postRepository.save(post);
         }
     }

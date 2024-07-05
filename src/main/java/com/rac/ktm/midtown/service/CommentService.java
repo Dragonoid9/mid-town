@@ -34,8 +34,18 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
+    public void deleteReply(Long replyId) {
+        replyRepository.deleteById(replyId);
+    }
+
     public Long findPostIdByCommentId(Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid comment Id:" + commentId));
         return comment.getPost().getId();
     }
+
+    public Long findPostIdByReplyId(Long replyId) {
+        Reply reply = replyRepository.findById(replyId).orElseThrow(() -> new IllegalArgumentException("Invalid reply Id:" + replyId));
+        return reply.getComment().getPost().getId();
+    }
+
 }

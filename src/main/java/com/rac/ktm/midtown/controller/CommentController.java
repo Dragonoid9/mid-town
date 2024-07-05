@@ -54,4 +54,10 @@ public class CommentController {
         commentService.deleteComment(commentId);
         return "redirect:/rac/post/detail/" + postId;
     }
+    @PostMapping("/reply/delete")
+        public String deleteReply(@RequestParam("replyId")Long replyId){
+        Long postId = commentService.findPostIdByReplyId(replyId);
+        commentService.deleteReply(replyId);
+        return "redirect:/rac/post/detail/" + postId;
+    }
 }
